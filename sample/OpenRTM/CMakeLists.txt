@@ -84,3 +84,8 @@ add_cnoid_sample_rtc(${target} TankKinematicsControllerRTC.cpp)
 configure_file(OpenRTM-TankKinematics.cnoid ${CNOID_SOURCE_SHARE_DIR}/project COPYONLY)
 configure_file(TankKinematics.conf ${PROJECT_BINARY_DIR}/${CNOID_PLUGIN_SUBDIR}/rtc/TankKinematics.conf COPYONLY)
 install(FILES TankKinematics.conf DESTINATION ${CNOID_PLUGIN_SUBDIR}/rtc)
+
+# SimTime Controller
+set(target SimTimeControllerRTC)
+add_cnoid_sample_rtc(${target} SimTimeControllerRTC.cpp)
+configure_file(OpenRTM-SimTime.cnoid ${CNOID_SOURCE_SHARE_DIR}/project COPYONLY)
