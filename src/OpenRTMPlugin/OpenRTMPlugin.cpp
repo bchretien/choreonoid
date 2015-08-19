@@ -10,6 +10,7 @@
 #include "ChoreonoidPeriodicExecutionContext.h"
 #include "OpenRTMUtil.h"
 #include "RTSNameServerView.h"
+#include "PauseSimulatorItem.h"
 #include <cnoid/Plugin>
 #include <cnoid/ItemManager>
 #include <cnoid/Archive>
@@ -169,6 +170,7 @@ public:
             boost::bind(&OpenRTMPlugin::restore, this, _1));
 
         RTSNameServerView::initializeClass(this);
+        PauseSimulatorItem::initializeClass(this);
 
         return true;
     }
