@@ -163,6 +163,7 @@ set(plugin_sources
   ChoreonoidExecutionContext.cpp
   ChoreonoidPeriodicExecutionContext.cpp
   RTSNameServerView.cpp
+  PauseSimulatorItem.cpp
   )
 
 set(plugin_headers
@@ -199,6 +200,7 @@ else()
                                 RTCItem.cpp
                                 OpenHRPClockGeneratorItem.cpp
                                 ChoreonoidExecutionContext.cpp 
+                                PauseSimulatorItem.cpp
                                 PROPERTIES COMPILE_FLAGS "-fvisibility=hidden")
   endif()
 endif()
