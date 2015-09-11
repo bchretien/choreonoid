@@ -218,7 +218,7 @@ bool PauseSimulatorItemImpl::createRTC()
     // Create a component
     format param("PauseSimulatorRTC?instance_name=%1%&logger.enable=NO&"
                  "exec_cxt.periodic_type=PeriodicExecutionContext&"
-                 "exec_cxt.periodic.rate=10");
+                 "exec_cxt.periodic.rate=500");
 
     rtc = dynamic_cast<PauseSimulatorRTC*>
       (createManagedRTC(str(param % instanceName).c_str()));
