@@ -156,7 +156,8 @@ PauseSimulatorItemImpl::PauseSimulatorItemImpl(PauseSimulatorItem* self)
     simulatorItem = 0;
     rtc = 0;
     isEnabled = true;
-    sleepTime = 0.;
+    // Default sleep time of 1ms
+    sleepTime = 1.;
     instanceName = "PauseSimulatorRTC";
 }
 
@@ -309,7 +310,7 @@ void PauseSimulatorItem::doPutProperties(PutPropertyFunction& putProperty)
 void PauseSimulatorItemImpl::doPutProperties(PutPropertyFunction& putProperty)
 {
     putProperty(_("Enabled"), isEnabled, changeProperty(isEnabled));
-    putProperty.min(0.0)(_("Sleep time (ms)"), sleepTime, changeProperty(sleepTime));
+    putProperty.min(1.0)(_("Sleep time (ms)"), sleepTime, changeProperty(sleepTime));
     putProperty(_("RTC instance name"), instanceName, changeProperty(instanceName));
 }
 
