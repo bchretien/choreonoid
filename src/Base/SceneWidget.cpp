@@ -451,6 +451,9 @@ SceneWidgetImpl::SceneWidgetImpl(SceneWidget* self)
         QGLWidget::setFormat(glfmt);
         cout << "swapInterval = " << QGLWidget::format().swapInterval() << endl;
     }
+
+    // Enable antialiasing
+    QGLWidget::setFormat(QGLFormat(QGL::SampleBuffers));
     
     setFocusPolicy(Qt::WheelFocus);
 
