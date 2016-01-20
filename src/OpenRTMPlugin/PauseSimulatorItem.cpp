@@ -187,7 +187,7 @@ bool PauseSimulatorItem::isEnabled()
 }
 
 
-ItemPtr PauseSimulatorItem::doDuplicate() const
+Item* PauseSimulatorItem::doDuplicate() const
 {
     return new PauseSimulatorItem(*this);
 }
