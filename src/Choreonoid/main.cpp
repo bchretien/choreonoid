@@ -9,11 +9,20 @@
 #include <QIcon>
 #include <cstdlib>
 
+#ifdef __linux__
+#include <fenv.h>
+#endif // __linux__
+
 using namespace std;
 using namespace cnoid;
 
 int main(int argc, char *argv[])
 {
+#ifdef __linux__
+    // Enable floating-point exceptions (except FE_INEXACT)
+    feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
+#endif // __linux__
+
     cnoid::App app(argc, argv);
 
     QIcon icon;
