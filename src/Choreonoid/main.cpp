@@ -18,11 +18,6 @@ using namespace cnoid;
 
 int main(int argc, char *argv[])
 {
-#ifdef __linux__
-    // Enable floating-point exceptions (except FE_INEXACT)
-    feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
-#endif // __linux__
-
     cnoid::App app(argc, argv);
 
     QIcon icon;
@@ -30,6 +25,12 @@ int main(int argc, char *argv[])
     icon.addFile(":/Icons/icon/choreonoid48.png");
 
     app.initialize("Choreonoid", "Choreonoid", icon, getenv("CNOID_PLUGIN_PATH"));
+
+#ifdef __linux__
+    // Enable floating-point exceptions (except FE_INEXACT)
+    feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
+#endif // __linux__
+
     app.exec();
     
     return 0;
