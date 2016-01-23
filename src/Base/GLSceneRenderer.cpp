@@ -22,6 +22,8 @@
 #include <boost/bind.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <iostream>
+#include <cstdio>
+#include <cstdlib>
 
 //#define DO_DEPTH_BUFFER_TYPE_TEST
 
@@ -162,6 +164,30 @@ public:
     virtual void visitFog(SgFog* fog);
     virtual void visitCamera(SgCamera* camera);
 };
+
+// http://stackoverflow.com/a/11258474/1043187
+void checkOpenGLError(const char* stmt, const char* fname, int line)
+{
+    GLenum err = GL_NO_ERROR;
+    bool failed = false;
+    while ((err = glGetError()) != GL_NO_ERROR)
+    {
+        printf("OpenGL error %08x at %s:%i - for %s\n", err, fname, line, stmt);
+        failed = true;
+    }
+    if (failed)
+      std::abort();
+}
+
+#ifndef NDEBUG
+#define GL_CHECK(cmd) do { \
+        cmd; \
+        checkOpenGLError(#cmd, __FILE__, __LINE__); \
+    } while (0)
+#else // NDEBUG
+    #define GL_CHECK(cmd) cmd
+#endif // NDEBUG
+
 }
 
 
@@ -1312,28 +1338,28 @@ bool GLSceneRenderer::pick(int x, int y)
 */
 bool GLSceneRendererImpl::pick(int x, int y)
 {
-    glPushAttrib(GL_ENABLE_BIT);
+    GL_CHECK(glPushAttrib(GL_ENABLE_BIT));
 
     //glDisable(GL_LIGHTING); // disable this later in 'renderCamera()'
-    glDisable(GL_BLEND);
-    glDisable(GL_MULTISAMPLE);
-    glDisable(GL_TEXTURE_2D);
-    glDisable(GL_DITHER);
-    glDisable(GL_FOG);
+    GL_CHECK(glDisable(GL_BLEND));
+    GL_CHECK(glDisable(GL_MULTISAMPLE));
+    GL_CHECK(glDisable(GL_TEXTURE_2D));
+    GL_CHECK(glDisable(GL_DITHER));
+    GL_CHECK(glDisable(GL_FOG));
 
     if(!SHOW_IMAGE_FOR_PICKING){
-        glScissor(x, y, 1, 1);
-        glEnable(GL_SCISSOR_TEST);
+        GL_CHECK(glScissor(x, y, 1, 1));
+        GL_CHECK(glEnable(GL_SCISSOR_TEST));
     }
     
     isPicking = true;
     render();
     isPicking = false;
 
-    glPopAttrib();
+    GL_CHECK(glPopAttrib());
 
     GLfloat color[4];
-    glReadPixels(x, y, 1, 1, GL_RGBA, GL_FLOAT, color);
+    GL_CHECK(glReadPixels(x, y, 1, 1, GL_RGBA, GL_FLOAT, color));
     if(SHOW_IMAGE_FOR_PICKING){
         color[2] = 0.0f;
     }
@@ -1344,13 +1370,13 @@ bool GLSceneRendererImpl::pick(int x, int y)
     if(0 < id && id < pickingNodePathList.size()){
         pickedNodePath = *pickingNodePathList[id];
         GLfloat depth;
-        glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+        GL_CHECK(glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth));
         GLdouble ox, oy, oz;
-        gluUnProject(x, y, depth,
+        GL_CHECK(gluUnProject(x, y, depth,
                      lastViewMatrix.matrix().data(),
                      lastProjectionMatrix.data(),
                      viewport.data(),
-                     &ox, &oy, &oz);
+                     &ox, &oy, &oz));
         pickedPoint << ox, oy, oz;
     }
 
@@ -2020,48 +2046,48 @@ void GLSceneRendererImpl::writeVertexBuffers(SgMesh* mesh, ShapeCache* cache, bo
 
     if(USE_VBO){
         if(cache->vertexBufferName() == GL_INVALID_VALUE){
-            glGenBuffers(1, &cache->vertexBufferName());
-            glBindBuffer(GL_ARRAY_BUFFER, cache->vertexBufferName());
-            glBufferData(GL_ARRAY_BUFFER, vertices->size() * sizeof(Vector3f), vertices->data(), GL_STATIC_DRAW);
+            GL_CHECK(glGenBuffers(1, &cache->vertexBufferName()));
+            GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, cache->vertexBufferName()));
+            GL_CHECK(glBufferData(GL_ARRAY_BUFFER, vertices->size() * sizeof(Vector3f), vertices->data(), GL_STATIC_DRAW));
         }
     } else {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, vertices->data());
+        GL_CHECK(glEnableClientState(GL_VERTEX_ARRAY));
+        GL_CHECK(glVertexPointer(3, GL_FLOAT, 0, vertices->data()));
     }
     if(normals){
         if(USE_VBO){
             if(cache->normalBufferName() == GL_INVALID_VALUE){
-                glGenBuffers(1, &cache->normalBufferName());
-                glBindBuffer(GL_ARRAY_BUFFER, cache->normalBufferName());
-                glBufferData(GL_ARRAY_BUFFER, normals->size() * sizeof(Vector3f), normals->data(), GL_STATIC_DRAW);
+                GL_CHECK(glGenBuffers(1, &cache->normalBufferName()));
+                GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, cache->normalBufferName()));
+                GL_CHECK(glBufferData(GL_ARRAY_BUFFER, normals->size() * sizeof(Vector3f), normals->data(), GL_STATIC_DRAW));
             }
         } else {
-            glEnableClientState(GL_NORMAL_ARRAY);
-            glNormalPointer(GL_FLOAT, 0, normals->data());
+            GL_CHECK(glEnableClientState(GL_NORMAL_ARRAY));
+            GL_CHECK(glNormalPointer(GL_FLOAT, 0, normals->data()));
         }
     }
     bool useColorArray = false;
     if(colors){
         if(!USE_VBO){
-            glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-            glEnable(GL_COLOR_MATERIAL);
-            glEnableClientState(GL_COLOR_ARRAY);
-            glColorPointer(4, GL_FLOAT, 0, &colors[0][0]);
+            GL_CHECK(glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE));
+            GL_CHECK(glEnable(GL_COLOR_MATERIAL));
+            GL_CHECK(glEnableClientState(GL_COLOR_ARRAY));
+            GL_CHECK(glColorPointer(4, GL_FLOAT, 0, &colors[0][0]));
             useColorArray = true;
         }
     }
     if(hasTexture){
         if(USE_VBO){
             if(cache->texCoordBufferName() == GL_INVALID_VALUE){
-                glGenBuffers(1, &cache->texCoordBufferName());
-                glBindBuffer(GL_ARRAY_BUFFER, cache->texCoordBufferName());
-                glBufferData(GL_ARRAY_BUFFER, texCoords->size() * sizeof(Vector2f), texCoords->data(), GL_STATIC_DRAW);
+                GL_CHECK(glGenBuffers(1, &cache->texCoordBufferName()));
+                GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, cache->texCoordBufferName()));
+                GL_CHECK(glBufferData(GL_ARRAY_BUFFER, texCoords->size() * sizeof(Vector2f), texCoords->data(), GL_STATIC_DRAW));
             }
         } else {
-            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-            glTexCoordPointer(2, GL_FLOAT, 0, texCoords->data());
+            GL_CHECK(glEnableClientState(GL_TEXTURE_COORD_ARRAY));
+            GL_CHECK(glTexCoordPointer(2, GL_FLOAT, 0, texCoords->data()));
         }
-        glEnable(GL_TEXTURE_2D);
+        GL_CHECK(glEnable(GL_TEXTURE_2D));
     }
 
     if(USE_VBO){
@@ -2069,26 +2095,26 @@ void GLSceneRendererImpl::writeVertexBuffers(SgMesh* mesh, ShapeCache* cache, bo
             cache->size = vertices->size();
 
         } else if(cache->indexBufferName() == GL_INVALID_VALUE){
-            glGenBuffers(1, &cache->indexBufferName());
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cache->indexBufferName());
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangleVertices->size(), &triangleVertices->front(), GL_STATIC_DRAW);
+            GL_CHECK(glGenBuffers(1, &cache->indexBufferName()));
+            GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cache->indexBufferName()));
+            GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangleVertices->size(), &triangleVertices->front(), GL_STATIC_DRAW));
             cache->size = triangleVertices->size();
         }
             
     } else {
         if(USE_INDEXING){
-            glDrawElements(GL_TRIANGLES, triangleVertices->size(), GL_UNSIGNED_INT, &triangleVertices->front());
+            GL_CHECK(glDrawElements(GL_TRIANGLES, triangleVertices->size(), GL_UNSIGNED_INT, &triangleVertices->front()));
         } else {
-            glDrawArrays(GL_TRIANGLES, 0, vertices->size());
+            GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, vertices->size()));
         }
     }
 
     if(useColorArray){
-        glDisable(GL_COLOR_MATERIAL);
+        GL_CHECK(glDisable(GL_COLOR_MATERIAL));
         stateFlag.set(CURRENT_COLOR);
     }
     if(hasTexture){
-        glDisable(GL_TEXTURE_2D);
+        GL_CHECK(glDisable(GL_TEXTURE_2D));
     }
 
     if(doNormalVisualization && !isPicking){
@@ -2100,10 +2126,10 @@ void GLSceneRendererImpl::writeVertexBuffers(SgMesh* mesh, ShapeCache* cache, bo
                 lines.push_back(v);
                 lines.push_back(v + (*normals)[i] * normalLength);
             }
-            glDisableClientState(GL_NORMAL_ARRAY);
-            glVertexPointer(3, GL_FLOAT, 0, lines.front().data());
+            GL_CHECK(glDisableClientState(GL_NORMAL_ARRAY));
+            GL_CHECK(glVertexPointer(3, GL_FLOAT, 0, lines.front().data()));
             setColor(Vector4f(0.0f, 1.0f, 0.0f, 1.0f));
-            glDrawArrays(GL_LINES, 0, lines.size());
+            GL_CHECK(glDrawArrays(GL_LINES, 0, lines.size()));
         }
         enableLighting(true);
     }
