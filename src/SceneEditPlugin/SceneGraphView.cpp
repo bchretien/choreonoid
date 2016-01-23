@@ -571,10 +571,10 @@ void SceneGraphViewImpl::renderMarker(GLSceneRenderer& renderer)
     if(bb.empty())
         return;
 
-    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
-    glDisable(GL_LIGHTING);
+    GL_CHECK(glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT));
+    GL_CHECK(glDisable(GL_LIGHTING));
 
-    glColor3f(1.0f, 0.0f, 1.0f);
+    GL_CHECK(glColor3f(1.0f, 0.0f, 1.0f));
 
     glBegin(GL_LINES);
 
@@ -607,8 +607,8 @@ void SceneGraphViewImpl::renderMarker(GLSceneRenderer& renderer)
         glVertex3f(max.x(), max.y(), z[i]);
     }
 
-    glEnd();
-    glPopAttrib();
+    GL_CHECK(glEnd());
+    GL_CHECK(glPopAttrib());
 }
 
 

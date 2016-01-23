@@ -726,8 +726,8 @@ void SceneWidgetImpl::renderGrid(GLSceneRenderer& renderer, Plane p)
         return;
     }
 
-    glPushAttrib(GL_LIGHTING_BIT);
-    glDisable(GL_LIGHTING);
+    GL_CHECK(glPushAttrib(GL_LIGHTING_BIT));
+    GL_CHECK(glDisable(GL_LIGHTING));
 
     renderer.setColor(gridColor[p]);
 
@@ -781,31 +781,31 @@ void SceneWidgetImpl::renderGrid(GLSceneRenderer& renderer, Plane p)
         ++i;
     } while(x < half);
 
-    glEnd();
+    GL_CHECK(glEnd());
 
-    glPopAttrib();
+    GL_CHECK(glPopAttrib());
 }
 
 
 void SceneWidgetImpl::renderCoordinateAxes(GLSceneRenderer& renderer)
 {
-    glPushAttrib(GL_LIGHTING_BIT);
-    glDisable(GL_LIGHTING);
+    GL_CHECK(glPushAttrib(GL_LIGHTING_BIT));
+    GL_CHECK(glDisable(GL_LIGHTING));
 
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
+    GL_CHECK(glMatrixMode(GL_PROJECTION));
+    GL_CHECK(glPushMatrix());
+    GL_CHECK(glLoadIdentity());
 
     int x, y, w, h;
     renderer.getViewport(x, y, w, h);
-    glOrtho((double)(x - 26), (double)(w - 26), (double)(y - 24), (double)(h - 24), -100.0, 100.0);
+    GL_CHECK(glOrtho((double)(x - 26), (double)(w - 26), (double)(y - 24), (double)(h - 24), -100.0, 100.0));
 
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
+    GL_CHECK(glMatrixMode(GL_MODELVIEW));
+    GL_CHECK(glPushMatrix());
+    GL_CHECK(glLoadIdentity());
     Affine3 transform(renderer.currentCameraPosition());
     Affine3 inv = transform.inverse();
-    glMultMatrixd(inv.data());
+    GL_CHECK(glMultMatrixd(inv.data()));
 
     renderer.setColor(Vector4f(1.0,0.0,0.0,0.0));
     renderer.visitPosTransform(xAxis);
@@ -814,12 +814,12 @@ void SceneWidgetImpl::renderCoordinateAxes(GLSceneRenderer& renderer)
     renderer.setColor(Vector4f(0.4,0.6,1.0,0.0));
     renderer.visitPosTransform(zAxis);
     
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
-    glPopMatrix();
+    GL_CHECK(glMatrixMode(GL_PROJECTION));
+    GL_CHECK(glPopMatrix());
+    GL_CHECK(glMatrixMode(GL_MODELVIEW));
+    GL_CHECK(glPopMatrix());
 
-    glPopAttrib();
+    GL_CHECK(glPopAttrib());
 }
 
 
@@ -1079,7 +1079,7 @@ bool SceneWidgetImpl::updateLatestEventPath()
                 f.setDoubleBuffer(false);
                 buffer = new QGLPixelBuffer(s, f, this);
                 buffer->makeCurrent();
-                glEnable(GL_DEPTH_TEST);
+                GL_CHECK(glEnable(GL_DEPTH_TEST));
             }
         }
     }

@@ -11,11 +11,24 @@
 #include <boost/function.hpp>
 #include "exportdecl.h"
 
+#if (!(defined NDEBUG) && defined(ENABLE_OPENGL_DEBUG))
+// Helper macro to debug OpenGL calls.
+// **WARNING**: do not use between glBegin and glEnd.
+#define GL_CHECK(cmd) do { \
+        cmd; \
+        checkOpenGLError(#cmd, __FILE__, __LINE__); \
+    } while (0)
+#else // NDEBUG
+    #define GL_CHECK(cmd) cmd
+#endif // NDEBUG
+
 namespace cnoid {
 
 class GLSceneRendererImpl;
 class SgCustomGLNode;
 class Mapping;
+
+void checkOpenGLError(const char* cmd, const char* fun, int line);
     
 class CNOID_EXPORT GLSceneRenderer : public SceneRenderer
 {

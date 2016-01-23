@@ -758,6 +758,12 @@ if(ENABLE_SIMULATION_PROFILING)
     add_definitions(-DENABLE_SIMULATION_PROFILING)
 endif()
 
+# OpenGL error checking
+option(ENABLE_OPENGL_DEBUG "Enable OpenGL debugging" OFF)
+if(ENABLE_OPENGL_DEBUG)
+    add_definitions(-DENABLE_OPENGL_DEBUG)
+endif()
+
 # Document installaiton
 install(FILES NEWS DESTINATION ${CNOID_DOC_SUBDIR})
 install(FILES LICENSE DESTINATION ${CNOID_DOC_SUBDIR})
