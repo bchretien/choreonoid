@@ -1066,7 +1066,7 @@ void SceneWidgetImpl::updateLatestEvent(QMouseEvent* event)
 
 bool SceneWidgetImpl::updateLatestEventPath()
 {
-    if(config->bufferForPickingCheck.isChecked()){
+    /*if(config->bufferForPickingCheck.isChecked()){
         const QSize s = size();
         if(buffer && (buffer->size() != s)){
             buffer->makeCurrent();
@@ -1082,7 +1082,7 @@ bool SceneWidgetImpl::updateLatestEventPath()
                 GL_CHECK(glEnable(GL_DEPTH_TEST));
             }
         }
-    }
+    }*/
 
     if(buffer){
         buffer->makeCurrent();
