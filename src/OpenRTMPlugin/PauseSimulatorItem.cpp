@@ -39,6 +39,10 @@ public:
 
     bool pause();
 
+    void currentTime(double t);
+
+    RTC::Time getTime () const;
+
 protected:
     // DataInPort declaration
     RTC::TimedBoolean m_pause;
@@ -47,6 +51,9 @@ protected:
     // DataOutPort declaration
     RTC::TimedBoolean m_isPaused;
     RTC::OutPort<RTC::TimedBoolean> m_isPausedOut;
+
+    RTC::TimedDouble m_t;
+    RTC::OutPort<RTC::TimedDouble> m_tOut;
 };
 
 class PauseSimulatorItemImpl
@@ -86,9 +93,11 @@ public:
 PauseSimulatorRTC::PauseSimulatorRTC(RTC::Manager* manager)
     : RTC::DataFlowComponentBase(manager),
       m_pauseIn("pause", m_pause),
-      m_isPausedOut("isPaused", m_isPaused)
+      m_isPausedOut("isPaused", m_isPaused),
+      m_tOut("t", m_t)
 {
   m_pause.data = false;
+  m_t.data = 0.;
 }
 
 
@@ -101,8 +110,9 @@ RTC::ReturnCode_t PauseSimulatorRTC::onInitialize()
     // Set InPort buffers
     addInPort("pause", m_pauseIn);
 
-    // Set OutPort buffer
+    // Set OutPort buffers
     addOutPort("isPaused", m_isPausedOut);
+    addOutPort("t", m_tOut);
 
     return RTC::RTC_OK;
 }
@@ -114,6 +124,23 @@ bool PauseSimulatorRTC::pause()
       m_pauseIn.read();
     }
     return m_pause.data;
+}
+
+void PauseSimulatorRTC::currentTime(double currentTime)
+{
+  m_t.data = currentTime;
+  m_t.tm = getTime();
+  m_tOut.write();
+}
+
+RTC::Time PauseSimulatorRTC::getTime () const
+{
+  coil::TimeValue coiltm (coil::gettimeofday ());
+  RTC::Time tm;
+  tm.sec = static_cast<CORBA::ULong> (coiltm.sec ());
+  tm.nsec = static_cast<CORBA::ULong> (coiltm.usec () * 1000);
+
+  return tm;
 }
 
 
@@ -278,6 +305,7 @@ bool PauseSimulatorItemImpl::initializeSimulation(SimulatorItem* simulatorItem)
 void PauseSimulatorItemImpl::onPreDynamics()
 {
     currentTime = simulatorItem->currentTime();
+    rtc->currentTime(currentTime);
 }
 
 
