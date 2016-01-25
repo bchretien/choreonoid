@@ -764,6 +764,12 @@ if(ENABLE_OPENGL_DEBUG)
     add_definitions(-DENABLE_OPENGL_DEBUG)
 endif()
 
+# Enable SIGFPE signal to detect arithmetic errors
+option(ENABLE_SIGFPE "Enable floating-point exceptions" OFF)
+if(ENABLE_SIGFPE)
+    add_definitions(-DENABLE_SIGFPE)
+endif()
+
 # Document installaiton
 install(FILES NEWS DESTINATION ${CNOID_DOC_SUBDIR})
 install(FILES LICENSE DESTINATION ${CNOID_DOC_SUBDIR})

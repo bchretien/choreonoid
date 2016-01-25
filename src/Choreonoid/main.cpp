@@ -26,10 +26,10 @@ int main(int argc, char *argv[])
 
     app.initialize("Choreonoid", "Choreonoid", icon, getenv("CNOID_PLUGIN_PATH"));
 
-#ifdef __linux__
+#if (defined __linux__ && defined ENABLE_SIGFPE)
     // Enable floating-point exceptions (except FE_INEXACT)
     feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
-#endif // __linux__
+#endif // (defined __linux__ && defined ENABLE_SIGFPE)
 
     app.exec();
     
