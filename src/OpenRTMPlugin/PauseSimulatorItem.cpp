@@ -316,6 +316,9 @@ void PauseSimulatorItemImpl::onPreDynamics()
 
 void PauseSimulatorItemImpl::onPostDynamics()
 {
+    currentTime = simulatorItem->currentTime();
+    rtc->currentTime(currentTime);
+
     while(rtc->pause())
     {
         msleep(sleepTime);
