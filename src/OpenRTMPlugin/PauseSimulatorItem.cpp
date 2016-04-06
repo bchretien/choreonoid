@@ -96,6 +96,7 @@ PauseSimulatorRTC::PauseSimulatorRTC(RTC::Manager* manager)
       m_isPausedOut("isPaused", m_isPaused),
       m_tOut("t", m_t)
 {
+  m_isPaused.data = false;
   m_pause.data = false;
   m_t.data = 0.;
 }
@@ -123,6 +124,9 @@ bool PauseSimulatorRTC::pause()
     if(m_pauseIn.isNew()){
       m_pauseIn.read();
     }
+    m_isPaused.data = m_pause.data;
+    m_isPaused.tm = getTime();
+    m_isPausedOut.write();
     return m_pause.data;
 }
 
