@@ -21,6 +21,7 @@
 #include "gettext.h"
 
 #include <iostream>
+#include <limits>
 
 using namespace std;
 using namespace cnoid;
@@ -47,6 +48,8 @@ protected:
     // DataInPort declaration
     RTC::TimedBoolean m_pause;
     RTC::InPort<RTC::TimedBoolean> m_pauseIn;
+    RTC::TimedDouble m_playUntil;
+    RTC::InPort<RTC::TimedDouble> m_playUntilIn;
 
     // DataOutPort declaration
     RTC::TimedBoolean m_isPaused;
@@ -93,11 +96,13 @@ public:
 PauseSimulatorRTC::PauseSimulatorRTC(RTC::Manager* manager)
     : RTC::DataFlowComponentBase(manager),
       m_pauseIn("pause", m_pause),
+      m_playUntilIn("playUntil", m_playUntil),
       m_isPausedOut("isPaused", m_isPaused),
       m_tOut("t", m_t)
 {
   m_isPaused.data = false;
   m_pause.data = false;
+  m_playUntil.data = std::numeric_limits<double>::infinity();
   m_t.data = 0.;
 }
 
@@ -110,6 +115,7 @@ RTC::ReturnCode_t PauseSimulatorRTC::onInitialize()
 {
     // Set InPort buffers
     addInPort("pause", m_pauseIn);
+    addInPort("playUntil", m_playUntilIn);
 
     // Set OutPort buffers
     addOutPort("isPaused", m_isPausedOut);
@@ -124,10 +130,13 @@ bool PauseSimulatorRTC::pause()
     if(m_pauseIn.isNew()){
       m_pauseIn.read();
     }
+    if(m_playUntilIn.isNew()){
+      m_playUntilIn.read();
+    }
     m_isPaused.data = m_pause.data;
     m_isPaused.tm = getTime();
     m_isPausedOut.write();
-    return m_pause.data;
+    return m_pause.data || (m_t.data > m_playUntil.data);
 }
 
 void PauseSimulatorRTC::currentTime(double currentTime)
