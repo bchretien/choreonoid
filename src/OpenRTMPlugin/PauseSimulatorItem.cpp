@@ -167,7 +167,7 @@ void PauseSimulatorItem::initializeClass(ExtensionManager* ext)
         "version",           "0.1",
         "vendor",            "AIST",
         "category",          "Choreonoid",
-        "activity_type",     "DataFlowComponent",
+        "activity_type",     "PERIODIC",
         "max_instance",      "10",
         "language",          "C++",
         "lang_type",         "compile",
