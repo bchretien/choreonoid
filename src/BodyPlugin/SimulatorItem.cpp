@@ -1719,7 +1719,7 @@ void SimulatorItemImpl::run()
                     const double compensationTime = -diff * compensationRatio;
                     compensatedSimulationTime += compensationTime;
                     diff += compensationTime;
-                    const double delayOverThresh = -diff - 1.0;
+                    const double delayOverThresh = -diff - 100.0;
                     if(delayOverThresh > 0.0){
                         compensatedSimulationTime += delayOverThresh;
                     }
